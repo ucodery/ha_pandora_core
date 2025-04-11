@@ -29,7 +29,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import Event, HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.config_entries import ConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,11 +46,10 @@ CURRENT_SONG_PATTERN = re.compile(r'"(.*?)"\s+by\s+"(.*?)"\son\s+"(.*?)"', re.MU
 STATION_PATTERN = re.compile(r'Station\s"(.+?)"', re.MULTILINE)
 
 
-def setup_platform(
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigType,
+    entry: ConfigEntry,
     add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up the Pandora media player platform."""
     if not _pianobar_exists():
@@ -62,7 +61,7 @@ def setup_platform(
     def _stop_pianobar(_event: Event) -> None:
         pandora.turn_off()
 
-    hass.bus.listen_once(EVENT_HOMEASSISTANT_STOP, _stop_pianobar)
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, _stop_pianobar)
     add_entities([pandora])
 
 

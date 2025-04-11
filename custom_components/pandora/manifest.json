@@ -1,10 +1,13 @@
 {
   "domain": "pandora",
   "name": "Pandora",
-  "codeowners": [],
+  "codeowners": ["@ucodery"],
+  "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/pandora",
+  "issue_tracker": "https://github.com/ucodery/ha_pandora_core/issues",
   "iot_class": "local_polling",
   "loggers": ["pexpect", "ptyprocess"],
   "quality_scale": "legacy",
-  "requirements": ["pexpect==4.9.0"]
+  "requirements": ["pexpect==4.9.0"],
+  "version": "2025.3.3.1"
 }
