@@ -100,7 +100,7 @@ class PandoraMediaPlayer(MediaPlayerEntity):
         pianobar.delayafterread = None
         pianobar.delayafterclose = 0
         pianobar.delayafterterminate = 0
-        pianobar.logfile = sys.stdout.buffer
+        pianobar.logfile = sys.stdout
         _LOGGER.debug("Started pianobar subprocess")
         mode = await pianobar.expect(
             ["Receiving new playlist", "Select station:", "Email:"],
