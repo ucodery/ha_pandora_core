@@ -95,7 +95,7 @@ class PandoraMediaPlayer(MediaPlayerEntity):
         self._pianobar: pexpect.spawn[str] | None = None
 
     async def start_pianobar(self) -> bool:
-        pianobar = pexpect.spawn("pianobar", encoding="utf-8")
+        pianobar = pexpect.spawn("pianobar", encoding="utf-8", env=os.environ)
         pianobar.delaybeforesend = None
         pianobar.delayafterread = None
         pianobar.delayafterclose = 0
