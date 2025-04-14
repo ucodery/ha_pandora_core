@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 import logging
 import os
@@ -11,6 +12,8 @@ import signal
 from typing import cast
 
 import pexpect
+import pandora.clientbuilder
+import pydora.configure
 
 from homeassistant import util
 from homeassistant.components.media_player import (
@@ -20,6 +23,7 @@ from homeassistant.components.media_player import (
     MediaType,
 )
 from homeassistant.const import (
+    CONF_USERNAME,
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_MEDIA_NEXT_TRACK,
     SERVICE_MEDIA_PLAY,
@@ -54,7 +58,7 @@ async def async_setup_entry(
     """Set up the Pandora media player platform."""
     if not _pianobar_exists():
         return
-    pandora = PandoraMediaPlayer("Pandora")
+    pandora = PandoraMediaPlayer(entry.data[CONF_USERNAME])
 
     # Make sure we end the pandora subprocess on exit in case user doesn't
     # power it down.
@@ -63,6 +67,11 @@ async def async_setup_entry(
 
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, _stop_pianobar)
     add_entities([pandora])
+
+
+# does IO blocking...
+pandora_api_config = pydora.configure.PandoraKeysConfigParser().load()["android"]
+pianobar_config = pandora.clientbuilder.PianobarConfigFileBuilder().parse_config()
 
 
 class PandoraMediaPlayer(MediaPlayerEntity):
@@ -82,7 +91,7 @@ class PandoraMediaPlayer(MediaPlayerEntity):
 
     def __init__(self, name: str) -> None:
         """Initialize the Pandora device."""
-        self._attr_name = name
+        self._attr_name = f"pandora_{name}"
         self._attr_state = MediaPlayerState.OFF
         self._attr_source = ""
         self._attr_media_title = ""
@@ -91,9 +100,21 @@ class PandoraMediaPlayer(MediaPlayerEntity):
         self._attr_source_list = []
         self._time_remaining = 0
         self._attr_media_duration = 0
+
+        self._pandora_client = pandora.clientbuilder.SettingsDictBuilder({
+            "DECRYPTION_KEY": pandora_api_config["decryption_key"], 
+            "ENCRYPTION_KEY": pandora_api_config["encryption_key"], 
+            "PARTNER_USER": pandora_api_config["username"],
+            "PARTNER_PASSWORD": pandora_api_config["password"],
+            "DEVICE": pandora_api_config["device"], 
+            "API_HOST": pandora_api_config["api_host"],
+        }).build()
         self._pianobar: pexpect.spawn[str] | None = None
 
     async def start_pianobar(self) -> bool:
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, self._pandora_client.login, pianobar_config["USER"]["USERNAME"], pianobar_config["USER"]["PASSWORD"])
+        _LOGGER.warn(self._pandora_client.default_audio_quality)
         pianobar = pexpect.spawn("pianobar", encoding="utf-8")
         pianobar.delaybeforesend = None
         pianobar.delayafterread = None

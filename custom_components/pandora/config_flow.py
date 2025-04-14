@@ -35,4 +35,4 @@ class PandoraConfigFlow(ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(user_input[CONF_USERNAME])
         self._abort_if_unique_id_configured()
 
-        return self.async_create_entry(title=user_input[CONF_NAME], data={})
+        return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
