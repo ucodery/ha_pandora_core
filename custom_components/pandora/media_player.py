@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import signal
+import sys
 from typing import cast
 
 import pexpect
@@ -99,11 +100,13 @@ class PandoraMediaPlayer(MediaPlayerEntity):
         pianobar.delayafterread = None
         pianobar.delayafterclose = 0
         pianobar.delayafterterminate = 0
+        pianobar.logfile = sys.stdout.buffer
         _LOGGER.debug("Started pianobar subprocess")
         mode = await pianobar.expect(
             ["Receiving new playlist", "Select station:", "Email:"],
             async_=True,
         )
+        _LOGGER.warn(str(pianobar))
         if mode == 1:
             # station list was presented. dismiss it.
             pianobar.sendcontrol("m")
@@ -178,6 +181,7 @@ class PandoraMediaPlayer(MediaPlayerEntity):
         await self._send_station_list_command()
         self._pianobar.sendline(f"{station_index}")
         await self._pianobar.expect("\r\n", async_=True)
+        _LOGGER.warn(str(self._pianobar))
         self._attr_state = MediaPlayerState.PLAYING
 
     async def _send_station_list_command(self) -> None:
@@ -186,11 +190,13 @@ class PandoraMediaPlayer(MediaPlayerEntity):
         self._pianobar.send("s")
         try:
             await self._pianobar.expect("Select station:", async_=True, timeout=1)
+            _LOGGER.warn(str(self._pianobar))
         except pexpect.exceptions.TIMEOUT:
             # try again. Buffer was contaminated.
             await self._clear_buffer()
             self._pianobar.send("s")
             await self._pianobar.expect("Select station:", async_=True)
+            _LOGGER.warn(str(self._pianobar))
 
     async def update_playing_status(self) -> None:
         """Query pianobar for info about current media_title, station."""
@@ -216,6 +222,7 @@ class PandoraMediaPlayer(MediaPlayerEntity):
                 ],
                 async_=True,
             )
+            _LOGGER.warn(str(self._pianobar))
         except pexpect.exceptions.EOF:
             _LOGGER.warning("Pianobar process already exited")
             return None
