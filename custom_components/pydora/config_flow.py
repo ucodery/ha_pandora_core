@@ -13,8 +13,8 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 
-class PandoraConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Config flow for Pandora."""
+class PydoraConfigFlow(ConfigFlow, domain=DOMAIN):
+    """Config flow for Pydora."""
 
     VERSION = 1
     MINOR_VERSION = 1

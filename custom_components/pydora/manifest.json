@@ -1,13 +1,15 @@
 {
-  "domain": "pandora",
-  "name": "Pandora",
+  "domain": "pydora",
+  "name": "Pydora",
   "codeowners": ["@ucodery"],
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/pandora",
   "issue_tracker": "https://github.com/ucodery/ha_pandora_core/issues",
-  "iot_class": "local_polling",
+  "iot_class": "cloud_polling",
+  "integraion_type": "service",
   "loggers": ["pydora", "pandora"],
   "quality_scale": "legacy",
+  "dependencies": ["ffmpeg"],
   "requirements": ["pydora>=2.3.0"],
   "version": "2025.3.3.2"
 }
