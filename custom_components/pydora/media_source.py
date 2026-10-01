@@ -36,13 +36,22 @@ class PandoraMediaSource(MediaSource):
             media_content_type=MediaType.MUSIC,
             title="Pandora Stations",
             can_play=False,
+<<<<<<< HEAD
             can_expand=False,
+=======
+            can_expand=True,
+            children_media_class=MediaClass.MUSIC,
+>>>>>>> 325b4ad (migrate to pydora)
             children=[
                 BrowseMediaSource(
                     domain=DOMAIN,
                     identifier=station.id,
                     media_class=MediaClass.MUSIC,
+<<<<<<< HEAD
                     media_content_type=MediaType.MUSIC,
+=======
+                    media_content_type="audio/aac",
+>>>>>>> 325b4ad (migrate to pydora)
                     title=station.name,
                     thumbnail=station.art_url,
                     can_play=True,
